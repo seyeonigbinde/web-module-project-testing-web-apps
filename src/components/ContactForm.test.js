@@ -29,31 +29,24 @@ test('renders ONE error message if user enters less then 5 characters into first
 test('renders THREE error messages if user enters no values into any fields.', async () => {
     render(<ContactForm />);
     const firstNameInput = screen.getByLabelText(/first Name/i);
-    userEvent.type(firstNameInput, "Seye");
-    waitFor(async () => {
+    userEvent.type(firstNameInput, "");
+    const emailInput = screen.getByLabelText(/email/i);
+    userEvent.type(emailInput, "");
+    const messageInput = screen.getByLabelText(/message/i);
+    userEvent.type(messageInput, "");
+
     const firstNameError = screen.queryByText(
         /Error: firstName must have at least 5 characters./i
       );
-      expect(firstNameError).toBeInTheDocument();
-    });
-    render(<ContactForm />);
-    const emailInput = screen.getByLabelText(/email/i);
-    userEvent.type(emailInput, "seyeonigbindegmail");
-    waitFor(async () => {
-    const emailError = screen.queryByText(
+      const emailError =  screen.queryByText(
         /Error: email must be a valid email address./i
       );
-      expect(emailError).toBeInTheDocument();
-    });
-    render(<ContactForm />);
-    const messageInput = screen.getByLabelText(/message/i);
-    userEvent.type(messageInput, "");
-    waitFor(async () => {
-    const messageError = screen.queryByText(
+      const messageError =  screen.queryByText(
         /Error: message is a required field./i
       );
+      expect(firstNameError).toBeInTheDocument();
+      expect(emailError).toBeInTheDocument();
       expect(messageError).toBeInTheDocument();
-    });
     
 });
 
@@ -63,12 +56,12 @@ test('renders ONE error message if user enters a valid first name and last name 
     userEvent.type(firstNameInput, "Seyet");
     expect(firstNameInput).toBeInTheDocument();
 
-    render(<ContactForm />);
+   
     const lastNameInput = screen.getByLabelText(/last Name/i);
     userEvent.type(lastNameInput, "Onigbinde");
     expect(lastNameInput).toBeInTheDocument();
 
-    render(<ContactForm />);
+   
     const emailInput = screen.getByLabelText(/email/i);
     userEvent.type(emailInput, "n");
     waitFor(async () => {
@@ -89,8 +82,6 @@ test('renders "email must be a valid email address" if an invalid email is enter
       );
       expect(emailError).toBeInTheDocument();
     });
-    setTimeout(() => {
-    }, 2000);
 });
 
 
@@ -98,13 +89,14 @@ test('renders "lastName is a required field" if an last name is not entered and 
     render(<ContactForm />);
     
     const lastNameInput = screen.getByLabelText(/last Name/i);
-    userEvent.type(lastNameInput, "Onigbinde");
-    const button = screen.getByRole("button");
+    userEvent.type(lastNameInput, "");
+    const button = screen.getByRole("button", {name:/submit/i});
     userEvent.click(button);
     waitFor(async () => {
-      const lastNameError = screen.queryByText(
+      const lastNameError = await screen.queryByText(
         /Error: lastName is a required field./i
       );
+      
       expect(lastNameError).toBeInTheDocument();
     });
   });
@@ -121,7 +113,7 @@ test('renders all firstName, lastName and email text when submitted. Does NOT re
     const messageInput = screen.getByLabelText(/message/i);
     userEvent.type(messageInput, "Thank you");
 
-    const button = screen.getByRole("button");
+    const button = await screen.getByRole("button");
     userEvent.click(button);
 });
 
@@ -133,11 +125,13 @@ test('renders all fields text when all fields are submitted.', async () => {
     userEvent.type(lastNameInput, "Onigbinde");
     const emailInput = screen.getByLabelText(/email/i);
     userEvent.type(emailInput, "seyeonigbinde@gmail.com");
+    const messageInput = screen.getByLabelText(/message/i);
+    userEvent.type(messageInput, "Thank you");
 
     const button = screen.getByRole("button");
     userEvent.click(button);
         waitFor(async ()=>{
-                const formDisplay = screen.queryByText("Seyet");
+                const formDisplay = await screen.findByText("Seyet");
                 expect(formDisplay).toBeInTheDocument();
             });
             
